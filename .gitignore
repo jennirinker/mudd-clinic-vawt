@@ -1,3 +1,7 @@
+# repo-specific
+res/
+htc/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
