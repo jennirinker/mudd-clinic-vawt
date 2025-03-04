@@ -2,6 +2,7 @@ begin simulation ;
   time_stop    150;
   solvertype   1 ;    (newmark)
   on_no_convergence continue ;
+  convergence_limits 1 1 1e-7 ;
   logfile   ./log/H-rotor_3blades.log;
   visualization ./visualization/H-rotor_3blades.hdf5;
   begin newmark;

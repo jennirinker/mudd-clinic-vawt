@@ -2,13 +2,13 @@ begin simulation ;
   time_stop    150;
   solvertype   1 ;    (newmark)
   on_no_convergence continue ;
-  convergence_limits 1 1 1e-7 ;
+  convergence_limits 0.1 1 1e-7 ;
   logfile   ./log/H-rotor_3blades.log;
   visualization ./visualization/H-rotor_3blades.hdf5;
   begin newmark;
     beta      0.27;
     gamma     0.51;  
-    deltat    0.008;
+    deltat    0.001;
     bdynamic  1.0 ;
   end newmark;
 end simulation;
@@ -18,6 +18,7 @@ begin new_htc_structure;
     type        timoschenko ;
     nbodies     1 ;
     node_distribution     c2_def ;
+    damping_posdef 0 0 0 1e-8 1e-8 1e-8 ;  add damping for numerical stability
 	gravity 0;
 	begin timoschenko_input;
       filename ./data/Stiff.st ;
@@ -29,11 +30,12 @@ begin new_htc_structure;
       sec 2 0.0 0.0 -3.0  0.0 ;
       end c2_def ;
     end main_body;
-  begin main_body;  tower 2.0m 
+  begin main_body;  tower 2.0m   TODO! Fix me. 
     name        towertop ;
     type        timoschenko ;
     nbodies     1 ;
     node_distribution     c2_def ;
+    damping_posdef 0 0 0 1e-8 1e-8 1e-8 ;  add damping for numerical stability
 	gravity 0;
 	begin timoschenko_input;
       filename ./data/Stiff.st ;
@@ -74,6 +76,7 @@ begin new_htc_structure;
     type        timoschenko ;
     nbodies     1 ;
     node_distribution    c2_def;
+    damping_posdef 0 0 0 1e-8 1e-8 1e-8 ;  add damping for numerical stability
 	gravity 0;
    begin timoschenko_input ;
       filename ./data/Stiff.st ;
@@ -128,7 +131,7 @@ begin new_htc_structure;
       mbdy1  tower last;
       mbdy2  towertop 1;
       mbdy2_eulerang 0.0 0.0 0.0; 
-      mbdy2_ini_rotvec_d1 0.0 0.0 1.0 1.426 ; mbdy initial rotation velocity x.y.z.angle velocity[rad/s]  (mbdy 2 coordinates)
+      mbdy2_ini_rotvec_d1 0.0 0.0 1.0 18.850 ; mbdy initial rotation velocity x.y.z.angle velocity[rad/s]  (mbdy 2 coordinates)
     end relative;
     begin relative;
       mbdy1  towertop last;
@@ -193,7 +196,7 @@ begin new_htc_structure;
 	 		mbdy1 tower last;
 	 		mbdy2 towertop 1;
 	 		bearing_vector 2 0.0 0.0 1.0;        x=coo (0=global,1=mbdy1,2=mbdy2) vector in mbdy2 coordinates where the free rotation is present
-	 		omegas 1.426 ; rad/s
+	 		omegas 18.850 ; rad/s
 	 	end bearing3; 
 		begin fix1;  towertop to hub1
 			mbdy1 towertop last;
@@ -235,12 +238,12 @@ begin new_htc_structure;
 end new_htc_structure;      
 begin wind ;
   density                 1.225 ;
-  wsp                     20  ;
-  tint                    0.1442 ; Turbulence intensity
+  wsp                     4  ;
+  tint                    0.0 ; Turbulence intensity
   horizontal_input        1     ;            0=false, 1=true
   windfield_rotations     0.0  0.0  0.0 ;    yaw, tilt, rotation
-  center_pos0             0.0 0.0 -30.0 ;
-  shear_format            1  0.14  ;0=none,1=constant,2=log,3=power,4=linear
+  center_pos0             0.0 0.0 -5.0 ;
+  shear_format            1  0.0  ;0=none,1=constant,2=log,3=power,4=linear
   turb_format             0  ;  0=none, 1=mann,2=flex
   tower_shadow_method     0  ;  0=none, 1,3=potential flow, 2,4=jet
 end wind;
@@ -263,18 +266,26 @@ begin output;
   filename ./res/H-rotor_3blades ;
   data_format gtsdf;
   time 100 150;
-  buffer 1 ;
+  buffer 500 ;  how many time steps to save in memory before writing to file
+  deltat 0.005;  time step to write to output file
+  ; general outputs
   general time;
-  constraint bearing3 shaft_rot 3  ;
-  wind free_wind 1 0.0 0.0 -30.0;
-  aero omega;
-  aero thrust;
-  aero torque;
-  aero power;
+  constraint bearing3 shaft_rot 3  ;  # shaft rotational speed
+  wind free_wind 1 0.0 0.0 -5.0;  # wind speed at 5 m
+  ; aerodynamic parameters
+  aero omega;  "aerodynamic" rotor speed (average of blades)
+  aero thrust;  integration of aero thrust
+  aero torque;  aero torque, integration over all bladed sections (see note in manual)
+  aero power;  product of aerodynamic rotor speed and aerodynamic torque
   aero int_force 3 1 2 0 # Blade 1 aerodynamic Fy;
   aero int_force 3 2 2 0 # Blade 2 aerodynamic Fy;
   aero int_force 3 3 2 0 # Blade 3 aerodynamic Fy;
+  aero vrel 1 0.9144 ;  relative velocity at blade1 midpoint [m/s]
+  aero alfa 1 0.9144 ;  AoA at blade1 midpoint [deg]
+  aero lift 1 0.9144 ;  lift force at blade1 midpoint [kN/m]
+  aero drag 1 0.9144 ;  drag force at blade1 midpoint [kN/m]
+  ; forces and moments
   mbdy forcevec towertop 1 2 global   # Force at hub-height;
-  mbdy momentvec towertop 1 2 global   # Moment at hub-height;
+  mbdy momentvec towertop 1 2 global   # Moment at hub-height;  includes shaft torsion
 end output;
 exit;
