@@ -47,31 +47,7 @@ begin new_htc_structure;
       sec 2 0.0 0.0 -2.0  0.0 ; 
     end c2_def ;
   end main_body;
-  begin main_body;  hub1  0.1m
-    name        hub1 ;
-    type        timoschenko ;
-    nbodies     1 ;
-    node_distribution     c2_def ;
-    gravity 0;    	
-	begin timoschenko_input;
-      filename ./data/Stiff.st ;
-      set 1 1;                
-    end timoschenko_input;
-    begin c2_def;              Definition of centerline (main_body coordinates)
-      nsec 2;
-      sec 1 0.0 0.0 0.0     0.0 ; x,y,z,twist
-      sec 2 0.0 0.0 0.1     0.0 ; 
-    end c2_def ;
-  end main_body;
-  begin main_body;
-    name           hub2 ;
-    copy_main_body hub1;
-  end main_body;
-  begin main_body;
-    name           hub3 ;
-    copy_main_body hub1;
-  end main_body;
-  begin main_body;  strut1  0.6874m
+  begin main_body;  strut1  0.7874m
     name        strut1 ;            
     type        timoschenko ;
     nbodies     1 ;
@@ -85,7 +61,7 @@ begin new_htc_structure;
     begin c2_def;              Definition of centerline (main_body coordinates)
       nsec 2 ;
 		sec	1	0.0		0.0		0.0		0.0	;
-		sec	2	0.0		0.0		0.6874		0.0	;
+		sec	2	0.0		0.0		0.7874		0.0	;
 	end c2_def ;
   end main_body;
   begin main_body;
@@ -133,54 +109,39 @@ begin new_htc_structure;
       mbdy2_eulerang 0.0 0.0 0.0; 
       mbdy2_ini_rotvec_d1 0.0 0.0 1.0 18.850 ; mbdy initial rotation velocity x.y.z.angle velocity[rad/s]  (mbdy 2 coordinates)
     end relative;
-    begin relative;
+    begin relative;  towertop to strut1
       mbdy1  towertop last;
-      mbdy2  hub1 1;
+      mbdy2  strut1 1;
       mbdy2_eulerang 0.0 0.0 0.0; 	  
       mbdy2_eulerang 90.0 0.0 0.0; 
     end relative;
-    begin relative;
+    begin relative;  to strut2
       mbdy1  towertop last;
-      mbdy2  hub2 1;
+      mbdy2  strut2 1;
       mbdy2_eulerang 0.0 0.0 0.0; 
       mbdy2_eulerang 90.0 0.0 0.0;
 	  mbdy2_eulerang 0.0 120.0 0.0; 	  
     end relative;
-    begin relative;
+    begin relative;  to strut3
       mbdy1  towertop last;
-      mbdy2  hub3 1;
+      mbdy2  strut3 1;
       mbdy2_eulerang 0.0 0.0 0.0; 
       mbdy2_eulerang 90.0 0.0 0.0;
 	  mbdy2_eulerang 0.0 -120.0 0.0; 	  
     end relative;
-    begin relative;
-      mbdy1  hub1 1;
-      mbdy2  strut1 1;
-      mbdy2_eulerang 0.0 0.0 0.0; 
-    end relative;
-    begin relative;
-      mbdy1  hub2 1;
-      mbdy2  strut2 1;
-      mbdy2_eulerang 0.0 0.0 0.0; 
-    end relative;
-    begin relative;
-      mbdy1  hub3 1;
-      mbdy2  strut3 1;
-      mbdy2_eulerang 0.0 0.0 0.0; 
-    end relative;
-	begin relative;
+	begin relative;  strut1 to blade1
 	  mbdy1 strut1 last;         
 	  mbdy2 blade1 2;
 	  mbdy2_eulerang 0.0 0.0 0.0; 
 	  mbdy2_eulerang 90.0 0.0 0.0;  
 	end relative;   
-    begin relative;
+    begin relative;  strut2 to blade2
       mbdy1  strut2 last;         
       mbdy2  blade2 2;
 	  mbdy2_eulerang 0.0 0.0 0.0;	  
 	  mbdy2_eulerang 90.0 0.0 0.0;   
     end relative;
-    begin relative;
+    begin relative;  strut3 to blade3
       mbdy1  strut3 last;         
       mbdy2  blade3 2;
 	  mbdy2_eulerang 0.0 0.0 0.0;	  
@@ -198,29 +159,17 @@ begin new_htc_structure;
 	 		bearing_vector 2 0.0 0.0 1.0;        x=coo (0=global,1=mbdy1,2=mbdy2) vector in mbdy2 coordinates where the free rotation is present
 	 		omegas 18.850 ; rad/s
 	 	end bearing3; 
-		begin fix1;  towertop to hub1
+		begin fix1;  towertop to strut1
 			mbdy1 towertop last;
-			mbdy2 hub1 1;
+			mbdy2 strut1 1;
 		end fix1;
-		begin fix1;  towertop to hub2
+		begin fix1;  towertop to strut2
 			mbdy1 towertop last;
-			mbdy2 hub2 1;
+			mbdy2 strut2 1;
 		end fix1;
-		begin fix1;  towertop to hub3
+		begin fix1;  towertop to strut3
 			mbdy1 towertop last;
-			mbdy2 hub3 1;
-		end fix1;
-		begin fix1;  hub1 to strut1
-		  mbdy1 hub1 last;
-		  mbdy2 strut1 1;
-		end fix1;
-		begin fix1;  hub2 to strut2
-		  mbdy1 hub2 last;
-		  mbdy2 strut2 1;
-		end fix1;
-		begin fix1;  hub3 to strut3
-		  mbdy1 hub3 last;
-		  mbdy2 strut3 1;
+			mbdy2 strut3 1;
 		end fix1;
 		begin fix1;  strut1 to blade1
 		  mbdy1 strut1 last;
