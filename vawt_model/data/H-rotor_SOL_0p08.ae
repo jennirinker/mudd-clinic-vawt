@@ -1,6 +1,6 @@
 1		H-rotor Baseline
 1	2	Radius [m]	Chord [m]	Thickness [%]	C-set	Dyn stall
-			0	0.15	18.0	1	0
-		1.8288	0.15	18.0	1	0
+			0	0.15	18.0	1	;
+		1.8288	0.15	18.0	1	;
 
 		
