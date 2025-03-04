@@ -4,7 +4,7 @@ begin simulation ;
   on_no_convergence continue ;
   convergence_limits 0.1 1 1e-7 ;
   logfile   ./log/H-rotor_3blades.log;
-  visualization ./visualization/H-rotor_3blades.hdf5;
+  ;visualization ./visualization/H-rotor_3blades.hdf5;
   begin newmark;
     beta      0.27;
     gamma     0.51;  
@@ -260,7 +260,7 @@ begin aero ;
   aerosections       30;
   ae_sets            1 1 1;
   tiploss_method     0 ;     0=none, 1=normal
-  dynstall_method    0 ;     0=none, 1=stig �ye method,2=mhh method
+  dynstall_method    2 ;     0=none, 1=stig �ye method,2=mhh method
 end aero ;
 begin output;
   filename ./res/H-rotor_3blades ;
@@ -277,14 +277,15 @@ begin output;
   aero thrust;  integration of aero thrust
   aero torque;  aero torque, integration over all bladed sections (see note in manual)
   aero power;  product of aerodynamic rotor speed and aerodynamic torque
-  aero int_force 3 1 2 0 # Blade 1 aerodynamic Fy;
-  aero int_force 3 2 2 0 # Blade 2 aerodynamic Fy;
-  aero int_force 3 3 2 0 # Blade 3 aerodynamic Fy;
   aero vrel 1 0.9144 ;  relative velocity at blade1 midpoint [m/s]
   aero alfa 1 0.9144 ;  AoA at blade1 midpoint [deg]
   aero lift 1 0.9144 ;  lift force at blade1 midpoint [kN/m]
   aero drag 1 0.9144 ;  drag force at blade1 midpoint [kN/m]
-  ; forces and moments
+  aero int_force 2 1 1 0;  integrated aero force, 2=blade coor. sys, 1=blade1, 1=Fx, 4=tip to z m
+  aero int_force 2 2 1 0;  integrated aero force, 2=blade coor. sys, 2=blade2, 1=Fx, 4=tip to z m
+  aero int_force 2 3 1 0;  integrated aero force, 2=blade coor. sys, 3=blade3, 1=Fx, 4=tip to z m
+  ; displacements, forces and moments
+  mbdy state pos blade1 2 0 global # anchor1_glpos ; position of strut/blade anchor in global coorsys
   mbdy forcevec towertop 1 2 global   # Force at hub-height;
   mbdy momentvec towertop 1 2 global   # Moment at hub-height;  includes shaft torsion
 end output;
